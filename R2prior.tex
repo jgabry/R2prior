@@ -23,6 +23,7 @@
 \newcommand{\boldrho}{\boldsymbol{\rho}}
 \newcommand{\boldbeta}{\boldsymbol{\beta}}
 \newcommand{\boldtheta}{\boldsymbol{\theta}}
+\newcommand{\boldeps}{\boldsymbol{\epsilon}}
 \newcommand{\hatbeta}{\widehat{\boldbeta}}
 \newcommand{\hatalpha}{\widehat{\alpha}}
 \newcommand{\sigmaEps}{\sigma_{\epsilon}}
@@ -45,7 +46,6 @@
     \and Jonah Gabry$^\ast$
     \and Andrew Gelman$^\ast$
     \vspace{.1in}}
-\date{23 March 2016
     \vspace{-.2in}}
 
 %: Begin document
@@ -148,28 +148,40 @@ $K$ predictors, $\X$ is a $N \times K$ matrix of \emph{centered} predictors,
 $\y$ is a $N$-vector of outcomes, and $\overline{y}$ is the sample mean of the
 outcome.
 
-Taking a QR decomposition of the design matrix, $\X = \Q\R$, where $\Q^\top \Q =
-\mathbf{I}$ and $\R$ is upper triangular, we can write the maximum likelihood
-estimate for the regression coefficients --- the least squares solution --- as
+Taking a QR decomposition of the centered design matrix, $\X = \Q\R$, where
+$\Q^\top \Q = \mathbf{I}$ and $\R$ is upper triangular, we can write the maximum
+likelihood estimate for the regression coefficients --- the least squares
+solution --- as
 %
 $$\hatbeta = \left(\X^\top \X \right)^{-1} \X^\top \y = \R^{-1} \Q^\top \y.$$
 %
-The QR decomposition is often used for improved numerical stability (as in the
-familiar {\tt lm} function in R), but, as we outline below, it is also useful
-for thinking about priors in a Bayesian version of the linear model.
+It is helpful for intuition to notice that when substituting $\Q\R$ for $\X$
+in the linear model we obtain another linear model
+%
+$$\y = \X\boldbeta + \boldeps \implies \y = \Q\boldtheta + \boldeps,$$
+%
+where the relationship between $\boldbeta$ and $\boldtheta$ is given by
+%
+$$\boldbeta = \R^{-1}\boldtheta.$$
+%
+That is, we have moved from a regression of $\y$ on $\X$ to a regression of
+$\y$ on the orthogonal matrix $\Q$.
+
+The QR decomposition is often used in this way for improved numerical stability
+(as in the familiar {\tt lm} function in R), but, as we outline below, it is
+also useful for thinking about priors in a Bayesian version of the linear model.
 
 
 \section{Specification of the joint prior distribution}
 \label{sec:priors}
 
 The key innovation in this paper is the prior for the parameters in the
-QR-reparameterized model, which can be thought of as a prior on the correlations
-between the outcome $\y$ and the columns of the orthogonal matrix $\Q$. To
-understand this prior, we start with the equations that characterize the maximum
-likelihood solutions \emph{before} observing the data $\left(\y, \X\right)$.
+QR-reparameterized model. To understand this prior, we start with the equations
+that characterize the maximum likelihood solutions \emph{before} observing the
+data $\left(\y, \X\right)$.
 
-Let $\boldtheta = \Q^\top \y$ and $\Q_k$ denote the $k$th column of $\Q$. We can
-write the $k$th element of the vector $\boldtheta$ as
+Let $\boldtheta = \R\boldbeta = \Q^\top \y$ and $\Q_k$ denote the $k$th column
+of $\Q$. We can write the $k$th element of the vector $\boldtheta$ as
 $$\theta_k
   = {\rm Corr}(\y, \Q_k) \, \frac{{\rm sd}(\y)}{{\rm sd}(\Q_k)}
   = \rho_k \, \sigma_y \, \sqrt{N - 1},
@@ -178,11 +190,17 @@ where $\rho_k$ is the correlation between $\Q_k$ and the outcome, $\sigma_y$ is
 the marginal standard deviation of the outcome, and $1/\sqrt{N-1}$ is the
 standard deviation of $\Q_k$.
 
-Then let $\boldrho = \sqrt{R^2} \, \u$, where $\boldrho$ is the vector of
-correlations $\boldrho = (\rho_1, \dots, \rho_K)$ and $\u$ is a unit vector that is
-uniformally distributed on the surface of a hypersphere. Consequently, $\u^\top
-\u = 1$ implies that the sum of squared correlations is $\boldrho^\top \boldrho =
-R^2$, the familiar coefficient of determination for the linear model.
+We will return to $\sigma_y$ in Section~\ref{subsec:marginalSD} and for now
+focus on specifying a prior distribution for the vector of correlations
+$\boldrho = (\rho_1, \dots, \rho_K)$, that is, a prior on the correlations
+between $\y$ and the columns of $\Q$. Here we assume that $\boldrho$ has a
+spherical distribution represented by $\boldrho = \sqrt{R^2} \, \u$, where $\u$
+is a unit vector uniformally distributed on the surface of a hypersphere.
+Consequently, $\u^\top\u = 1$ implies that the sum of squared correlations is
+$\boldrho^\top \boldrho = R^2$. This is the familiar coefficient of determination for
+the linear model, which can be interpreted as the proportion of variance in $\y$
+attributable to $\X$.\footnote{The \Rsq is the same regardless of whether we
+use $\Q\theta$ or $\X\beta$.}
 
 \subsection{Prior for \Rsq}
 \label{subsec:r2prior}
@@ -489,12 +507,12 @@ the median absolute deviation (MAD) from the posterior median. The {\tt
 rstanarm} package reports {\tt MAD\_SD} rather than the raw posterior standard
 deviations because the former will be more robust for long-tailed distributions.
 }
-It would be safe to conclude that the least
-squares estimator considerably \emph{overfits} the data since there are only
-$24$ observations with which to estimate $12$ parameters and no prior
-information is leveraged. In general, we would expect the prior derived in this
-paper to be well-suited in situations like the one above, where there are many
-predictors relative to the number of observations.
+It would be safe to conclude that the least squares estimator considerably
+\emph{overfits} the data since there are only $24$ observations with which to
+estimate $12$ parameters and no prior information is leveraged. In general, we
+would expect the prior derived in this paper to be well-suited in situations
+like the one above, where there are many predictors relative to the number of
+observations.
 
 
 \section{Conclusion}
