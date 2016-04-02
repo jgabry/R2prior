@@ -46,6 +46,7 @@
     \and Jonah Gabry$^\ast$
     \and Andrew Gelman$^\ast$
     \vspace{.1in}}
+\date{2 April 2016
     \vspace{-.2in}}
 
 %: Begin document
@@ -180,47 +181,51 @@ QR-reparameterized model. To understand this prior, we start with the equations
 that characterize the maximum likelihood solutions \emph{before} observing the
 data $\left(\y, \X\right)$.
 
-Let $\boldtheta = \R\boldbeta = \Q^\top \y$ and $\Q_k$ denote the $k$th column
-of $\Q$. We can write the $k$th element of the vector $\boldtheta$ as
+Let $\boldtheta = \R\boldbeta = \Q^\top \y$, as above, and $\mathbf{q}_k$ denote
+the $k$th column of $\Q$. We can write the $k$th element of the vector
+$\boldtheta$ as
+%
 $$\theta_k
-  = {\rm Corr}(\y, \Q_k) \, \frac{{\rm sd}(\y)}{{\rm sd}(\Q_k)}
+  = {\rm Corr}(\y, \mathbf{q}_k) \, \frac{{\rm sd}(\y)}{{\rm sd}(\mathbf{q}_k)}
   = \rho_k \, \sigma_y \, \sqrt{N - 1},
 $$
-where $\rho_k$ is the correlation between $\Q_k$ and the outcome, $\sigma_y$ is
-the marginal standard deviation of the outcome, and $1/\sqrt{N-1}$ is the
-standard deviation of $\Q_k$.
+%
+where $\rho_k$ is the correlation between $\mathbf{q}_k$ and the outcome,
+$\sigma_y$ is the marginal standard deviation of the outcome, and $1/\sqrt{N-1}$
+is the standard deviation of $\mathbf{q}_k$. The next two subsections describe
+the priors for the vector of correlations $\boldrho = (\rho_1, \dots, \rho_K)$
+and the marginal standard deviation $\sigma_y$ that together compose the joint
+prior on the coefficients $\boldtheta$ of the reparameterized linear model.
 
-We will return to $\sigma_y$ in Section~\ref{subsec:marginalSD} and for now
-focus on specifying a prior distribution for the vector of correlations
-$\boldrho = (\rho_1, \dots, \rho_K)$, that is, a prior on the correlations
-between $\y$ and the columns of $\Q$. Here we assume that $\boldrho$ has a
-spherical distribution represented by $\boldrho = \sqrt{R^2} \, \u$, where $\u$
-is a unit vector uniformally distributed on the surface of a hypersphere.
-Consequently, $\u^\top\u = 1$ implies that the sum of squared correlations is
-$\boldrho^\top \boldrho = R^2$. This is the familiar coefficient of determination for
-the linear model, which can be interpreted as the proportion of variance in $\y$
-attributable to $\X$.\footnote{The \Rsq is the same regardless of whether we
-use $\Q\theta$ or $\X\beta$.}
+\subsection{Prior for the correlations and \Rsq}
+First we focus on specifying a prior distribution for $\boldrho$, that is, a
+prior on the correlations between $\y$ and the columns of $\Q$. Here we assume
+that $\boldrho$ has a spherical distribution represented stochastically by
+$\boldrho = \sqrt{R^2} \, \u$, where $\u$ is a unit vector uniformally
+distributed on the surface of a hypersphere. Consequently, $\u^\top\u = 1$
+implies that the sum of squared correlations is $\boldrho^\top \boldrho = R^2$.
+This is the familiar coefficient of determination for the linear model, which
+can be interpreted as the proportion of variance in $\y$ attributable to $\X$
+(or $\Q$).\footnote{Since $\Q\theta = \X\beta$, the \Rsq is the same for the
+reparameterized model as it is for the original.}
 
-\subsection{Prior for \Rsq}
-\label{subsec:r2prior}
+To complete the implied prior on $\boldrho$ requires specifying a prior on the
+uknown scalar parameter $R^2$. An uninformative prior on \Rsq would be standard
+uniform, which is a special case of a $\Betadist{a}{b}$ distribution with shape
+parameters $a = b = 1$. A non-uniform prior on \Rsq is somewhat analogous to
+ridge regression, which is popular in data mining and produces better
+out-of-sample predictions than least squares because it penalizes
+$\boldbeta^\top \boldbeta$, usually after standardizing the predictors. In our
+case, an \emph{informative} prior on \Rsq will effectively penalize
+$\boldrho^\top \boldrho$, which encourages the regression coefficients
+$\boldbeta = \R^{-1} \boldtheta$ to be closer to the origin.
 
-An uninformative prior on \Rsq would be standard uniform, which is a special
-case of a $\Betadist{a}{b}$ distribution with shape parameters $a = b = 1$.
-A non-uniform prior on \Rsq is somewhat analogous to ridge
-regression, which is popular in data mining and produces better out-of-sample
-predictions than least squares because it penalizes $\boldbeta^\top \boldbeta$,
-usually after standardizing the predictors. In our case, an \emph{informative}
-prior on \Rsq will effectively penalize $\boldrho^\top \boldrho$, which
-encourages the regression coefficients $\boldbeta = \R^{-1} \boldtheta$
-to be closer to the origin.
-
-Consider a correlation matrix among both the outcome and the predictors of our
-reparameterized model. \citeA{lkj} derives a distribution for a correlation
-matrix that depends only on a single shape parameter $\eta > 0$ and implies that
-the conditional variance of one variable given the remaining $K$ variables has a
-Beta distribution with parameters $a = \eta$ and $b = \halfK$. This means that
-the conditional variance of $\y$ (given the predictors) is
+Consider a correlation matrix among both the outcome $\y$ and the predictors
+$\Q$ of our reparameterized model. \citeA{lkj} derives a distribution for a
+correlation matrix that depends only on a single shape parameter $\eta > 0$ and
+implies that the conditional variance of one variable given the remaining $K$
+variables has a Beta distribution with parameters $a = \eta$ and $b = \halfK$.
+This means that the conditional variance of $\y$ (given the predictors) is
 %
 $$(1 - R^2) \sim \Betadist{\eta}{\halfK}$$
 %
@@ -306,9 +311,10 @@ increasingly concentrated around zero.}
 
 \subsection{Prior for the marginal standard deviation}
 \label{subsec:marginalSD}
-Let $\sigma_y = \omega s_y$, where $s_y$ is the sample standard deviation of the
-outcome and $\omega > 0$ is an unknown scale parameter to be estimated. We use
-the scale-invariant Jeffreys prior
+Let $\sigma_y$, the marginal standard deviation of the outcome $\y$, be
+represented by the product $\sigma_y = \omega s_y$, where $s_y$ is the sample
+standard deviation of the outcome and $\omega > 0$ is an unknown scale parameter
+to be estimated. We use the scale-invariant Jeffreys prior
 $f_\omega \left(\omega\right) \propto 1 / \omega,$
 which is proportional to a Jeffreys prior on the unknown $\sigma_y$,
 $$f_{\sigma_y} \left(\sigma_y\right) \propto \frac{1}{\sigma_y}
@@ -358,7 +364,12 @@ $$ \sigmaEps = \sigma_y \sqrt{1 - R^2} = \omega s_y \sqrt{1 - R^2},$$
 which follow from the definition of $R^2$ and the definition of $\sigma_y$ in
 terms of $\omega$ and $s_y$ from Section~\ref{subsec:marginalSD}. Thus, the only
 remaining distribution to specify is the prior for the model intercept
-$$\alpha = \overline{y} - \overline{\mathbf{x}}^\top \R^{-1} \boldtheta.$$
+%
+$$\alpha
+= \overline{y} - \overline{\mathbf{x}}^\top \boldbeta
+= \overline{y} - \overline{\mathbf{x}}^\top \R^{-1} \boldtheta.
+$$
+%
 As a default, a flat (improper uniform) prior $f_\alpha(\alpha) \propto 1$ is
 possible as the resulting posterior distribution will be proper. Other choices
 of $f_\alpha$ are also viable, for instance a zero-mean normal with scale
@@ -388,20 +399,20 @@ $$\left(\phi, \alpha, \u, R^2\right)^\draw
 \quad s = 1, \dots, S.$$
 Although some of these parameters are themselves useful (e.g, the log
 fit-ratio, $\phi$), we would like to make inferences with the posterior
-distribution of the parameters of interest $\boldbeta$, $\sigma_y$, and
-$\sigmaEps$. Following our definitions, we can obtain a sample from the
-posterior of $\left(\boldbeta, \sigma_y, \sigmaEps\right)$ from the MCMC draws
+distribution of the parameters of interest $\boldbeta$, $\sigmaEps$, and
+sometimes $\sigma_y$. Following our definitions, we can obtain a sample from the
+posterior of $\left(\boldbeta, \sigmaEps, \sigma_y\right)$ from the MCMC draws
 of the primitive parameters by computing
 %
 \begin{align*}
 \sigma_y^\draw &= \omega^\draw s_y = e^{\phi^\draw} s_y, \\
 \sigmaEps^\draw &= \sigma_y^\draw \sqrt{1 - {R^2}^\draw}, \\
-\boldbeta^\draw &= \R^{-1}\, \u^\draw \, \sigma_y^\draw
-                      \sqrt{{R^2}^\draw \left(N-1\right)},
+\boldbeta^\draw &= \R^{-1} \boldtheta^\draw
+                  = \R^{-1}\, \u^\draw \, \sigma_y^\draw
+                    \sqrt{{R^2}^\draw \left(N-1\right)},
 \end{align*}
 %
 for each draw $s = 1, \dots, S$.
-
 
 
 \section{Example}
