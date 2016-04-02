@@ -234,10 +234,14 @@ prior on the \Rsq itself is
 %
 $$R^2 \sim \Betadist{\halfK}{\eta}.$$
 
-Any available prior information about the location of \Rsq, which we will denote
-$\locRsq$, can be used to choose a value for the hyperparameter $\eta$. The
-following are four ways of implying the value of $\eta$ by taking $\locRsq$ to
-be (a) the prior mode of $R^2$, (b) the prior median of $R^2$, (c) the prior
+The first thing to notice about this Beta distribution for \Rsq is that it
+varies according to the number of predictors in the model (the number of columns
+of $\X$) but not the values of the predictors. Second, any available prior
+information about the location of \Rsq, which we will denote $\locRsq$, can be
+used to choose a value for the hyperparameter $\eta$.
+
+The following are four ways of implying the value of $\eta$ by taking $\locRsq$
+to be (a) the prior mode of $R^2$, (b) the prior median of $R^2$, (c) the prior
 mean of $R^2$, and (d) the prior mean of $\log{R^2}$:
 
 \begin{enumerate}[(a)]
