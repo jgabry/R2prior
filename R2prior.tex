@@ -369,7 +369,17 @@ $\sigma_y / \sqrt{N}$.
 
 The previous sections imply a joint posterior distribution for the primitive
 parameters
-$$f_{\em post}\left(\phi, \alpha, \u, R^2 \given \y, \X = \Q\R, \eta\right).$$
+%
+\begin{align*}
+f_{\em post}\left(\alpha, \phi, \u, R^2 \given \y, \X = \Q\R, \eta\right)
+  &\propto f_{\em prior}(\alpha, \phi, \u, R^2 \,|\, \eta,  \tfrac{K}{2}) \,
+    p(\y \,|\, \Q, \alpha, \phi, \u, R^2) \\[5pt]
+  &=f_\phi(\phi) \, f_\alpha(\alpha) \, f_\u(\u) \,
+    f_{R^2|K/2,\eta}(R^2 \,|\, \tfrac{K}{2}, \eta) \\
+  &\quad \times
+    \prod_{i=1}^N \mathsf{Normal}(y_i \,|\, \Q, \phi, \alpha, \u, R^2).
+\end{align*}
+%
 In Section~\ref{sec:example} we discuss sampling from this posterior using
 Markov chain Monte Carlo (MCMC). Here, assume we have already obtained a sample
 of size $S$ from $f_{post}$ consisting of MCMC draws
