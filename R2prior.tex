@@ -20,6 +20,7 @@
 
 % Custom math shortcuts for expressions used many times throughout the paper
 \newcommand{\Rsq}{$R^2\,$}
+\newcommand{\boldOmega}{\boldsymbol{\Omega}}
 \newcommand{\boldrho}{\boldsymbol{\rho}}
 \newcommand{\boldbeta}{\boldsymbol{\beta}}
 \newcommand{\boldtheta}{\boldsymbol{\theta}}
@@ -31,6 +32,7 @@
 \newcommand{\y}{\mathbf{y}}
 \newcommand{\Q}{\mathbf{Q}}
 \newcommand{\R}{\mathbf{R}}
+\renewcommand{\L}{\mathbf{L}}
 \renewcommand{\u}{\mathbf{u}}
 \newcommand{\locRsq}{\ell_{R^2}}
 \newcommand{\halfK}{\frac{K}{2}}
@@ -232,8 +234,9 @@ Consider a correlation matrix among both the outcome $\y$ and the predictors
 $\Q$ of our reparameterized model. \citeA{lkj} derives a distribution for a
 correlation matrix that depends only on a single shape parameter $\eta > 0$ and
 implies that the conditional variance of one variable given the remaining $K$
-variables has a Beta distribution with parameters $a = \eta$ and $b = \halfK$.
-This means that the conditional variance of $\y$ (given the predictors) is
+variables has a Beta distribution with parameters $a = \eta$ and $b = \halfK$
+(see Appendix~\ref{appendix:lkj}). This means that the proportion of so-called
+unexplained variation in $\y$ conditional on the predictors is
 %
 $$(1 - R^2) \sim \Betadist{\eta}{\halfK}$$
 %
@@ -569,6 +572,65 @@ We plan to implement this feature in future versions of {\tt rstanarm}.
 \nocite{Rcore}
 \nocite{HSAUR3-package}
 \bibliography{references.bib}
+
+\clearpage
+\begin{appendix}
+
+\section{LKJ}
+\label{appendix:lkj}
+
+Imagine a random $K+1$ dimensional correlation matrix $\boldOmega$ between the
+the $K$ predictors and the outcome variable, and let $\L$ be the Cholesky factor
+of $\boldOmega$ such that $\L\L^\top = \boldOmega$. The so-called LKJ
+distribution \cite{lkj, stan} for a symmetric, positive-definite matrix with
+unit diagonal is proportional to the determinant of the matrix raised to the
+power of one less than the value of a positive scalar shape parameter $\eta$,
+%
+$$
+\boldOmega \sim \mathsf{LKJ}(\eta) \implies
+f_{\Omega|\eta}(\boldOmega | \eta) \propto \det{(\boldOmega)}^{\eta - 1},
+\quad \eta > 0.
+$$
+%
+The distribution of the Cholesky factor $\L$ is then
+%
+\begin{align*}
+f_{\L|\eta}(\L | \eta)
+&\propto \left|J\right| \det{(\L\L^\top)}^{\eta - 1}, \quad \eta > 0 \\
+&= \prod_{d=2}^D \L_{d,d}^{2(\eta -1) + D - d},
+\end{align*}
+%
+where $D = K+1$ and $J$ is the determinant of the Jacobian matrix of the
+transformation.
+
+The extended onion method \cite{lkj} for constructing $\L$ such that it has the
+density above implies that the last diagonal element is $\L_{D,D} = \sqrt{1 -
+R^2}$. It also implies that the first $D-1$ elements in the final row of $\L$
+can be expressed as the vector $\L_{D,1:(D-1)} = \sqrt{R^2}\,\u$, where, as
+before, $\u$ is a unit vector distributed uniformly on the surface of a $K =
+D-1$ dimensional hypersphere and $R^2$ is a scalar between 0 and 1. We can
+therefore write the entire last row of $\L$ as the vector
+%
+$$
+\L_D = \left(\sqrt{R^2}\, u_1, \dots, \sqrt{R^2}\,u_{D-1}, \sqrt{1 - R^2}\right),
+$$
+%
+from which we see that the sum of squares along the last row is
+%
+\begin{align*}
+ \L_D \L_D^\top
+ &= \left(\sum_{d=1}^{D-1} \left(\sqrt{R^2}\,u_d\right)^2\right) +
+  \left(\sqrt{1 - R^2}\right)^2 \\
+ &= R^2 \sum_{d=1}^{D-1} u_d^2 + (1 - R^2) \\
+ &= R^2 + (1 - R^2) \\
+ &= 1.
+\end{align*}
+
+If $\boldOmega \sim \mathsf{LKJ}(\eta)$ then it follows from \citeA{lkj} that
+$1 - R^2$ has a $\Betadist{\eta}{\halfK}$ distribution and so $R^2$ itself
+is distributed $\Betadist{\halfK}{\eta}$.
+
+\end{appendix}
 
 
 %: End document
