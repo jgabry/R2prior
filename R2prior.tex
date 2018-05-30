@@ -57,18 +57,23 @@
 \thispagestyle{empty}
 
 \begin{abstract}
-\noindent We derive an approach for expressing prior beliefs about the location
-of the \Rsq, the familiar proportion of variance in the outcome variable
-attributable to the predictors under a linear model. In particular, when there
-are many predictors relative to the number of observations we expect the joint
-prior derived here to work better than placing independent heavy-tailed priors
-on the coefficients. This is standard practice in applied Bayesian data analysis
-but typically neither reflects the beliefs of the researcher nor conveys enough
-information to stabilize all the computations.
+\noindent We derive a novel multivariate probability distribution, which finds use as
+a joint prior for regression coefficients in Bayesian linear regression. The
+prior can be conceptualized as expressing prior beliefs about the location of
+the \Rsq, the familiar proportion of variance in the outcome variable
+attributable to the predictors under a linear model. When there are many
+predictors relative to the number of observations, expect the joint prior
+derived here to work better than placing independent heavy-tailed priors on the
+coefficients. Independent priors are standard practice in applied Bayesian data
+analysis but typically neither reflects the beliefs of the researcher nor
+conveys enough information to stabilize all the computations.
 \end{abstract}
 
 
 \section{Introduction}
+
+Bayesian inference of linear models is a routine exercise for 
+applied researchers and analysts. 
 
 Fully making Bayesian estimation of linear models routine for applied
 researchers requires prior distributions that work well for any data generated
